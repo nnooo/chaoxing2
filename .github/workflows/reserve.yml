@@ -39,5 +39,5 @@ jobs:
           USERNAMES: ${{ secrets.USERNAMES }}
           PASSWORDS: ${{ secrets.PASSWORDS }}
         run: |
-          python main.py --action
+          python ChaoXingReserveSeat-rebuild/ChaoXingReserveSeat-rebuild/main.py --action
 

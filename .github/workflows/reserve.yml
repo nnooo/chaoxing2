@@ -1,0 +1,43 @@
+# This is a basic workflow that is manually triggered
+
+name: auto_Reserve
+
+# 🌟 新增：设置工作流历史记录最多保留2天（按需调整）
+env:
+  GITHUB_RUN_EXPIRATION_DAYS: 2  # 自动删除2天前的运行记录
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  schedule:
+    - cron: "50 22 * * 0,1,2,3,4,5,6" # 周一到周五每天早上5:59启动（防止github action过于高负载）
+  workflow_dispatch:
+
+# 🌟 新增：并发组，确保同一时间只有一个任务运行
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false  # 不取消正在运行的任务（按需调整）
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+  
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: install dependency
+        run: |
+          python -m pip install --upgrade pip
+          sudo apt-get install build-essential libssl-dev libffi-dev  python3-dev -y
+          pip install cryptography requests opencv-python
+
+      - name: run script
+        env:
+          USERNAMES: ${{ secrets.USERNAMES }}
+          PASSWORDS: ${{ secrets.PASSWORDS }}
+        run: |
+          python main.py --action
+
